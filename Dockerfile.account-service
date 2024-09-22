@@ -1,0 +1,21 @@
+###
+# Build to Jar File
+###
+FROM maven:3.6.0-jdk-11-slim AS base
+
+ENV HOME=/home/app
+WORKDIR $HOME
+
+COPY . .
+
+RUN --mount=type=cache,target=/root/.m2 mvn -f $HOME/pom.xml clean package
+
+###
+# Run Application
+###
+FROM adoptopenjdk/openjdk11-openj9:alpine AS build-stage
+
+COPY --from=base /home/app/account-service/target/*.jar /app/account-service-application.jar
+COPY --from=base /home/app/account-service/src/main/resources/ /usr/app/config/
+
+CMD java -jar /app/account-service-application.jar

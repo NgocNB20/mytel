@@ -1,0 +1,1 @@
+INSERT INTO mytel_family_account.account_info (id, account_id, driver_license, full_name, last_update_at, current_balance, created_at, last_updated_at) VALUES ('3232823f-9203-0391-xaks-lkas230c6872', '1baa1b1b-4efc-4814-9c86-a1a243356a6c', '', 'Root Admin', '2023-05-18 09:33:43.299757', 741478, '2023-04-20 12:08:27.039000', '2023-05-12 10:58:35.976000');

@@ -1,0 +1,20 @@
+[submodule "account-service"]
+	path = account-service
+	url = https://devops:AA2Q5vGMVox5XwKWC6_Q@gitlab.mytel.com.mm/private-app/account-service.git
+	#url  = https://tungnd:glpat-fBRBxtUnHsCQYXdT_ddV@git.toprate.io/mytel/mytel-family/account-service.git
+	branch = master
+[submodule "booking-service"]
+	path = booking-service
+	url = https://devops:AA2Q5vGMVox5XwKWC6_Q@gitlab.mytel.com.mm/private-app/booking-service.git
+	#url  = https://tungnd:glpat-fBRBxtUnHsCQYXdT_ddV@git.toprate.io/mytel/mytel-family/booking-service.git
+	branch = master
+[submodule "resource-service"]
+	path = resource-service
+	url = https://devops:AA2Q5vGMVox5XwKWC6_Q@gitlab.mytel.com.mm/private-app/resource-service.git
+	#url  = https://tungnd:glpat-fBRBxtUnHsCQYXdT_ddV@git.toprate.io/mytel/mytel-family/resource-service.git
+	branch = master
+[submodule "mytel-common"]
+	path = mytel-common
+	url = https://devops:AA2Q5vGMVox5XwKWC6_Q@gitlab.mytel.com.mm/private-app/mytel-common.git
+	#url  = https://tungnd:glpat-fBRBxtUnHsCQYXdT_ddV@git.toprate.io/mytel/mytel-family/mytel-common.git
+	branch = master

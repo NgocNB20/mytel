@@ -1,0 +1,102 @@
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=/repo/mvn"
+  JOB_NAME: hub.toprate.io/booking-service
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  GIT_SSL_NO_VERIFY: "false"
+  SERVICE_NAME: booking-service
+  IMAGE_MVN_JDK: hub.toprate.io/mytel-jdk11:v1.0.0-SNAPSHOT
+
+stages:
+  - verify
+  - build
+  - deploy
+  - notify
+
+compile-app:
+  stage: verify
+  image: maven:3.8.4-jdk-11
+  tags:
+    - develop
+  script:
+    - mvn clean verify sonar:sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY_BOOKING_SERVICE -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN_BOOKING_SERVICE
+  only:
+    - merge_requests
+
+before_script:
+  - mkdir -p $HOME/.docker
+  - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+
+build-app:
+  stage: build
+  image: $IMAGE_MVN_JDK
+  tags:
+    - develop
+  script:
+    - mvn clean verify -Dmaven.test.skip=true
+    - docker build -t $JOB_NAME:$IMAGE_TAG .
+  only:
+    - develop
+    - main
+
+dev:
+  stage: deploy
+  needs: [ "build-app" ]
+  dependencies: [ ]
+  image: docker:dind
+  tags:
+    - develop
+  variables:
+    ENVIRONMENT: development
+    SERVICE_NAME: booking-service-dev
+  script:
+    - echo "Deploy start"
+    - docker stop $SERVICE_NAME || true && docker rm -fv $SERVICE_NAME || true
+    - docker run -d -t -i -e LOCAL_STORAGE_PATH='' -e AWS_STORAGE_URL=$AWS_STORAGE_URL -e AWS_ACCESS_KEY=$AWS_ACCESS_KEY -e AWS_SECRET_KEY=$AWS_SECRET_KEY -e AWS_BUCKET_NAME=$AWS_BUCKET_NAME -e AWS_REGION_STATIC=$AWS_REGION_STATIC -e CONFIG_LOCAL=$CONFIG_LOCAL -e MARIA_HOST=$MARIA_HOST -e MARIA_PASS=$MARIA_PASS -e MARIA_PORT=$MARIA_PORT -e MARIA_SERVICE=$MARIA_SERVICE_BOOKING -e MARIA_USER=$MARIA_USER -e KEYCLOAK_URL=$KEYCLOAK_URL -e KEYCLOAK_REALM=$KEYCLOAK_REALM -e KEYCLOAK_RESOURCE=$KEYCLOAK_RESOURCE -e KEYCLOAK_SECRET=$KEYCLOAK_SECRET -e  KEYCLOAK_ADMIN_USERNAME=$KEYCLOAK_ADMIN_USERNAME -e  KEYCLOAK_ADMIN_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD -e EXTERNAL_ACCOUNT_URL=$EXTERNAL_ACCOUNT_URL -e EXTERNAL_RESOURCE_URL=$EXTERNAL_RESOURCE_URL -p 9021:8080 --name $SERVICE_NAME $JOB_NAME:$IMAGE_TAG
+    - echo "Deploy success"
+  only:
+    - main
+
+staging:
+  stage: deploy
+  needs: [ "build-app" ]
+  when: manual
+  image: docker:dind
+  tags:
+    - develop
+  variables:
+    ENVIRONMENT: staging
+  script:
+    - echo "Deploy start"
+    - docker stop $SERVICE_NAME || true && docker rm -fv $SERVICE_NAME || true
+    - docker run -d -t -i -e AWS_STORAGE_URL=$AWS_STORAGE_URL -e AWS_ACCESS_KEY=$AWS_ACCESS_KEY -e AWS_SECRET_KEY=$AWS_SECRET_KEY -e AWS_BUCKET_NAME=$AWS_BUCKET_NAME -e AWS_REGION_STATIC=$AWS_REGION_STATIC -e CONFIG_LOCAL=$CONFIG_LOCAL -e MARIA_HOST=$MARIA_HOST -e MARIA_PASS=$MARIA_PASS -e MARIA_PORT=$MARIA_PORT -e MARIA_SERVICE=$MARIA_SERVICE_BOOKING -e MARIA_USER=$MARIA_USER -e KEYCLOAK_URL=$KEYCLOAK_URL -e KEYCLOAK_REALM=$KEYCLOAK_REALM -e KEYCLOAK_RESOURCE=$KEYCLOAK_RESOURCE -e KEYCLOAK_SECRET=$KEYCLOAK_SECRET -e  KEYCLOAK_ADMIN_USERNAME=$KEYCLOAK_ADMIN_USERNAME -e  KEYCLOAK_ADMIN_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD -e EXTERNAL_ACCOUNT_URL=$EXTERNAL_ACCOUNT_URL -e EXTERNAL_RESOURCE_URL=$EXTERNAL_RESOURCE_URL -p 9002:8080 --name $SERVICE_NAME $JOB_NAME:$IMAGE_TAG
+    - echo "Deploy success"
+  only:
+    - main
+
+notify-failure:
+  image: alpine:latest
+  stage: notify
+  when: on_failure
+  script:
+    - apk add --update git curl
+    - wget https://raw.githubusercontent.com/DiscordHooks/gitlab-ci-discord-webhook/master/send.sh
+    - chmod +x send.sh
+    - /bin/ash ./send.sh failure $DISCORD_WEBHOOK
+  tags:
+    - develop
+  only:
+    - main
+
+notify-success:
+  image: alpine:latest
+  stage: notify
+  when: on_success
+  script:
+    - apk add --update git curl
+    - wget https://raw.githubusercontent.com/DiscordHooks/gitlab-ci-discord-webhook/master/send.sh
+    - chmod +x send.sh
+    - /bin/ash ./send.sh success $DISCORD_WEBHOOK
+  tags:
+    - develop
+  only:
+    - main

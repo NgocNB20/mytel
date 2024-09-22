@@ -1,0 +1,24 @@
+###
+# Build to Jar File
+###
+FROM maven:3.6.0-jdk-11-slim AS base
+
+ENV HOME=/home/app
+WORKDIR $HOME
+
+COPY . .
+
+RUN --mount=type=cache,target=/root/.m2 mvn -f $HOME/pom.xml clean package
+
+###
+# Run Application
+###
+FROM adoptopenjdk/openjdk11-openj9:alpine AS build-stage
+
+RUN apk add fontconfig ttf-dejavu
+
+COPY --from=base /home/app/resource-service/target/*.jar /app/resource-service-application.jar
+COPY --from=base /home/app/resource-service/src/main/resources/ /usr/app/config/
+
+CMD java -jar /app/resource-service-application.jar
+

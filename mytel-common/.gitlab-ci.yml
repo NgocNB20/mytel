@@ -1,0 +1,33 @@
+
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=/repo/mvn"
+  GIT_SSL_NO_VERIFY: "false"
+
+stages:
+  - verify
+
+compile-app:
+  stage: verify
+  image: maven:3.8.4-jdk-11
+  tags:
+    - develop
+  script:
+    - mvn clean verify
+#    - sonar:sonar -Dsonar.projectKey=Mytel-family-common -Dsonar.host.url=https://sonar.toprate.io -Dsonar.login=sqp_74ee19f8530290d6e92b78d9529577df0e130405
+  only:
+    - merge_requests
+
+
+build-app:
+  stage: verify
+  image: maven:3.8.4-jdk-11
+  tags:
+    - develop
+  script:
+    - mvn clean install -Dmaven.test.skip=true
+  only:
+    - develop
+    - main
+
+

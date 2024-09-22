@@ -1,0 +1,58 @@
+Shift (Ca làm)
+ShiftService (Service để quản lý ca làm)
+ShiftController (Controller cho ca làm)
+ShiftFilter (Lọc ca làm)
+
+public class Shift {
+    private String name;
+    private LocalTime inTime;
+    private LocalTime outTime;
+    private LocalTime breakStart;
+    private LocalTime breakEnd;
+    private String workHours; // hoặc Duration nếu cần tính toán thời gian
+    
+    private int lateMinTime;
+    private int lateMaxTime;
+    private int lateWarnTime;
+    private int lateHalfDay;
+
+    private int earlyMinTime;
+    private int earlyMaxTime;
+    private int earlyWarnTime;
+	
+    // Getters and setters...
+}
+
+public class Shift_Group {
+	private String id;
+	private String shiftId
+	private String groupId
+}
+
+
+public class WorkGroup {
+	private String id;       // Mã nhóm
+    private String name;           // Tên nhóm
+    private int numberOfPeople;    // Số lượng người trong nhóm
+    private String type;           // Loại nhóm (ví dụ: Fixed shift)
+    private String location
+    // Getters and Setters
+}
+
+
+
+
+
+createShift() (Tạo mới ca làm)
+getAllShifts() (Danh sách ca làm)
+updateShift() (Chỉnh sửa ca làm)
+filterShifts() (Lọc ca làm)
+deleteShift() (Xóa ca làm)
+
+
+
+
+
+
+/*Làm rõ yêu cầu*/
++ Hết giờ chấm công của ca thì bên front-end có cho mở nút clock-in không

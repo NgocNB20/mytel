@@ -1,0 +1,1 @@
+INSERT INTO mytel_family_account.account_role (id, account_id, role_id, created_at, last_updated_at) VALUES (639, '1baa1b1b-4efc-4814-9c86-a1a243356a6c', '01df8b00-6799-437f-ab5b-c90397d5e202', '2023-05-10 03:08:19.876000', '2023-05-10 03:08:19.876000');
