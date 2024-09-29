@@ -37,4 +37,6 @@ public class WorkShift {
     private int earlyMinTime;
     private int earlyMaxTime;
     private int earlyWarnTime;
+
+
 }

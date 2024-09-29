@@ -49,9 +49,6 @@ public class DailyStatistic {
 
         }
 
-
-
-
     }
     private  String formatLateMessage(LocalDateTime clockIn, LocalTime shiftClockIn) {
 
